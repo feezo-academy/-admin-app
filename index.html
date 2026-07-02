@@ -237,7 +237,8 @@ table.tbl tbody tr:last-child td{border-bottom:none;}
     </div>
     <div class="topbar-right">
       <span id="hello">Hi</span>
-      <button class="signout-btn" onclick="doSignOut()">Sign out</button>
+      <button class="signout-btn" style="background:#2563eb;color:#fff;border-color:#2563eb;" onclick="openCreateAcademyModal()">+ New Academy</button>
+    <button class="signout-btn" onclick="doSignOut()">Sign out</button>
     </div>
   </div>
 
@@ -271,7 +272,16 @@ table.tbl tbody tr:last-child td{border-bottom:none;}
     </div>
 
     <div class="section" id="sec-signups">
-      <input type="text" class="search" id="searchSignups" placeholder="Search by email, slug, or academy name..." oninput="renderSignups()">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <input type="text" class="search" id="searchSignups" placeholder="Search academy name, admin, email..." oninput="renderSignups()" style="flex:1;min-width:180px;">
+        <select id="filterSignupsStatus" class="search" style="flex:0 0 auto;padding:8px 12px;font-size:13px;" onchange="renderSignups()">
+          <option value="">All statuses</option>
+          <option value="trial_active">Trial active</option>
+          <option value="active">Paying</option>
+          <option value="frozen">Frozen</option>
+          <option value="trial_expired">Trial expired</option>
+        </select>
+      </div>
       <div class="card">
         <div class="card-title"><span id="signupsTotal">All signups</span><span style="font-size:11px;color:var(--text-3);font-weight:500;">Click row for details</span></div>
         <div id="signupsTable"><div class="loading">Loading...</div></div>
@@ -279,6 +289,14 @@ table.tbl tbody tr:last-child td{border-bottom:none;}
     </div>
 
     <div class="section" id="sec-trials">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <input type="text" class="search" id="searchTrials" placeholder="Search academy name or admin..." oninput="renderTrials()" style="flex:1;min-width:180px;">
+        <select id="filterTrialsStatus" class="search" style="flex:0 0 auto;padding:8px 12px;font-size:13px;" onchange="renderTrials()">
+          <option value="">All trials</option>
+          <option value="trial_active">Active only</option>
+          <option value="trial_expired">Expired only</option>
+        </select>
+      </div>
       <div class="card">
         <div class="card-title"><span id="trialsTotal">Active trials</span></div>
         <div id="trialsTable"><div class="loading">Loading...</div></div>
@@ -286,7 +304,15 @@ table.tbl tbody tr:last-child td{border-bottom:none;}
     </div>
 
     <div class="section" id="sec-paying">
-      <input type="text" class="search" id="searchPaying" placeholder="Search paying customer..." oninput="renderPaying()">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <input type="text" class="search" id="searchPaying" placeholder="Search academy name or admin..." oninput="renderPaying()" style="flex:1;min-width:180px;">
+        <select id="filterPayingPlan" class="search" style="flex:0 0 auto;padding:8px 12px;font-size:13px;" onchange="renderPaying()">
+          <option value="">All plans</option>
+          <option value="basic">Basic</option>
+          <option value="pro">Pro</option>
+          <option value="premium">Premium</option>
+        </select>
+      </div>
       <div class="card">
         <div class="card-title"><span id="payingTotal">Paying customers</span></div>
         <div id="payingTable"><div class="loading">Loading...</div></div>
@@ -294,7 +320,15 @@ table.tbl tbody tr:last-child td{border-bottom:none;}
     </div>
 
     <div class="section" id="sec-customers">
-      <input type="text" class="search" id="searchCustomers" placeholder="Search any customer..." oninput="renderCustomers()">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <input type="text" class="search" id="searchCustomers" placeholder="Search academy name, admin, email..." oninput="renderCustomers()" style="flex:1;min-width:180px;">
+        <select id="filterCustomersPlan" class="search" style="flex:0 0 auto;padding:8px 12px;font-size:13px;" onchange="renderCustomers()">
+          <option value="">All plans</option>
+          <option value="basic">Basic</option>
+          <option value="pro">Pro</option>
+          <option value="premium">Premium</option>
+        </select>
+      </div>
       <div class="filter-bar" id="customerFilters">
         <button class="filter-btn active" data-filter="all">All <span id="fcnt-all">0</span></button>
         <button class="filter-btn" data-filter="trial">Trial <span id="fcnt-trial">0</span></button>
@@ -324,6 +358,112 @@ table.tbl tbody tr:last-child td{border-bottom:none;}
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- CREATE ACADEMY MODAL -->
+<div class="modal-overlay" id="createAcademyOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center;padding:20px;">
+  <div class="modal" style="max-width:420px;width:100%;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="font-size:16px;font-weight:700;color:var(--text);">➕ Create New Academy</div>
+      <button onclick="closeCreateAcademyModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-3);">×</button>
+    </div>
+    <div id="createAcademyError" style="display:none;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:14px;"></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Academy Name *</label>
+        <input id="ca_name" type="text" placeholder="e.g. Karate Club Chennai" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Academy ID (slug) * <span style="font-weight:400;color:var(--text-3);">lowercase, letters, numbers, hyphens</span></label>
+        <input id="ca_slug" type="text" placeholder="e.g. karate-club-chennai" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Admin Email *</label>
+        <input id="ca_email" type="email" placeholder="owner@gmail.com" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Admin Name</label>
+        <input id="ca_admin_name" type="text" placeholder="Owner's name" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Password * <span style="font-weight:400;color:var(--text-3);">min 6 characters</span></label>
+        <input id="ca_password" type="text" placeholder="Set initial password" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Starting Plan</label>
+        <select id="ca_plan" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;">
+          <option value="trial">Trial (7 days free)</option>
+          <option value="basic">Basic — ₹499/mo</option>
+          <option value="pro">Pro — ₹1,499/mo</option>
+          <option value="premium">Premium — ₹2,999/mo</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px;">
+      <button onclick="closeCreateAcademyModal()" style="flex:1;padding:11px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:#fff;">Cancel</button>
+      <button onclick="submitCreateAcademy()" id="ca_submit_btn" style="flex:2;padding:11px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Create Academy</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG PAYMENT MODAL -->
+<div class="modal-overlay" id="logPaymentOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center;padding:20px;">
+  <div class="modal" style="max-width:400px;width:100%;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="font-size:16px;font-weight:700;color:var(--text);">💰 Log Payment Received</div>
+      <button onclick="closeLogPaymentModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-3);">×</button>
+    </div>
+    <div id="lpAcademyName" style="font-size:12px;color:var(--text-3);margin-bottom:14px;"></div>
+    <div id="logPaymentError" style="display:none;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:14px;"></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;gap:10px;">
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Plan *</label>
+          <select id="lp_plan" onchange="updateLPAmount()" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+            <option value="basic">Basic</option>
+            <option value="pro">Pro</option>
+            <option value="premium">Premium</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Billing</label>
+          <select id="lp_billing" onchange="updateLPAmount()" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+            <option value="monthly">Monthly</option>
+            <option value="annual">Annual</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Amount (₹) *</label>
+        <input id="lp_amount" type="number" placeholder="499" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Period start *</label>
+          <input id="lp_start" type="date" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Period end *</label>
+          <input id="lp_end" type="date" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">UPI / Payment Ref</label>
+        <input id="lp_ref" type="text" placeholder="UPI ref or transaction ID" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Notes</label>
+        <input id="lp_notes" type="text" placeholder="Optional notes" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);cursor:pointer;">
+        <input type="checkbox" id="lp_activate" checked> Also activate this plan in the app immediately
+      </label>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px;">
+      <button onclick="closeLogPaymentModal()" style="flex:1;padding:11px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:#fff;">Cancel</button>
+      <button onclick="submitLogPayment()" id="lp_submit_btn" style="flex:2;padding:11px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Log Payment</button>
+    </div>
   </div>
 </div>
 
@@ -384,6 +524,31 @@ supabase.auth.getSession().then(({ data: { session } }) => {
 // =============================================================
 let _allCustomers = [];
 let _customerFilter = 'all';
+let _customerSort   = { col: 'name', dir: 'asc' };
+let _signupsSort    = { col: 'signup_at', dir: 'desc' };
+let _trialsSort     = { col: 'days_left', dir: 'asc' };
+let _payingSort     = { col: 'days_left', dir: 'asc' };
+
+function sortIcon(col, sortState) {
+  if (sortState.col !== col) return '<span style="opacity:.3;font-size:10px;margin-left:3px;">⇅</span>';
+  return sortState.dir === 'asc'
+    ? '<span style="font-size:10px;margin-left:3px;color:var(--accent);">▲</span>'
+    : '<span style="font-size:10px;margin-left:3px;color:var(--accent);">▼</span>';
+}
+function toggleSort(col, sortState, renderFn) {
+  if (sortState.col === col) sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+  else { sortState.col = col; sortState.dir = 'asc'; }
+  renderFn();
+}
+function applySort(list, col, dir) {
+  return list.slice().sort((a, b) => {
+    let va = a[col], vb = b[col];
+    if (va == null) va = dir === 'asc' ? '￿' : '';
+    if (vb == null) vb = dir === 'asc' ? '￿' : '';
+    if (typeof va === 'string') return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    return dir === 'asc' ? va - vb : vb - va;
+  });
+}
 let _appConfig = null;
 let _currentDetail = null;       // currently-open customer
 let _activeElevation = null;     // currently-active elevation row
@@ -610,24 +775,32 @@ function renderOverview(s) {
 // SIGNUPS
 // =============================================================
 function renderSignups() {
-  const q = (document.getElementById('searchSignups').value || '').toLowerCase().trim();
-  const filtered = _allCustomers.filter(c =>
-    !q || (c.name||'').toLowerCase().includes(q)
-       || (c.slug||'').toLowerCase().includes(q)
-       || (c.admin_email||'').toLowerCase().includes(q)
+  const q  = (document.getElementById('searchSignups')?.value || '').toLowerCase().trim();
+  const sf = (document.getElementById('filterSignupsStatus')?.value || '');
+  let list = _allCustomers.filter(c =>
+    (!q || (c.name||'').toLowerCase().includes(q) || (c.slug||'').toLowerCase().includes(q) || (c.admin_email||'').toLowerCase().includes(q) || (c.admin_name||'').toLowerCase().includes(q))
+    && (!sf || c.status === sf)
   );
-  document.getElementById('signupsTotal').textContent = `${filtered.length} signups`;
-  if (filtered.length === 0) { document.getElementById('signupsTable').innerHTML = '<div class="empty">No signups match.</div>'; return; }
+  list = applySort(list, _signupsSort.col, _signupsSort.dir);
+  document.getElementById('signupsTotal').textContent = `${list.length} signups`;
+  if (!list.length) { document.getElementById('signupsTable').innerHTML = '<div class="empty">No signups match.</div>'; return; }
+  const s = _signupsSort;
   document.getElementById('signupsTable').innerHTML = `
     <table class="tbl">
-      <thead><tr><th>Date</th><th>Academy</th><th>Admin</th><th>Status</th><th>Engagement</th></tr></thead>
-      <tbody>${filtered.map(c => `
+      <thead><tr>
+        <th onclick="toggleSort('signup_at',_signupsSort,renderSignups)" style="cursor:pointer;">Date${sortIcon('signup_at',s)}</th>
+        <th onclick="toggleSort('name',_signupsSort,renderSignups)" style="cursor:pointer;">Academy${sortIcon('name',s)}</th>
+        <th onclick="toggleSort('admin_name',_signupsSort,renderSignups)" style="cursor:pointer;">Admin${sortIcon('admin_name',s)}</th>
+        <th onclick="toggleSort('status',_signupsSort,renderSignups)" style="cursor:pointer;">Status${sortIcon('status',s)}</th>
+        <th onclick="toggleSort('student_count',_signupsSort,renderSignups)" style="cursor:pointer;">Engagement${sortIcon('student_count',s)}</th>
+      </tr></thead>
+      <tbody>${list.map(c => `
         <tr onclick="openDetail('${c.id}')">
           <td>${formatDate(c.signup_at)}</td>
           <td><b>${escapeHTML(c.name)}</b><br><span style="font-size:10px;color:var(--text-3);font-family:monospace;">${c.slug}${c.is_ghost ? '<span class="ghost-flag">GHOST</span>' : ''}</span></td>
-          <td style="font-size:11px;color:var(--text-2);">${escapeHTML(c.admin_email || '—')}</td>
+          <td style="font-size:11px;color:var(--text-2);">${escapeHTML(c.admin_name||'—')}<br><span style="font-size:10px;color:var(--text-3);">${escapeHTML(c.admin_email||'')}</span></td>
           <td>${statusPill(c)}</td>
-          <td><span class="engagement"><b>${c.student_count || 0}</b> stu · ${formatLastLogin(c.last_login_at)}</span></td>
+          <td><span class="engagement"><b>${c.student_count||0}</b> stu · ${formatLastLogin(c.last_login_at)}</span></td>
         </tr>`).join('')}</tbody></table>`;
 }
 
@@ -635,20 +808,35 @@ function renderSignups() {
 // TRIALS
 // =============================================================
 function renderTrials() {
-  const trials = _allCustomers.filter(c => ['trial_active','trial_expired'].includes(c.status));
-  document.getElementById('trialsTotal').textContent = `${trials.length} trials`;
-  if (trials.length === 0) { document.getElementById('trialsTable').innerHTML = '<div class="empty">No active trials.</div>'; return; }
-  trials.sort((a,b)=>(a.days_left||0)-(b.days_left||0));
+  const q  = (document.getElementById('searchTrials')?.value || '').toLowerCase().trim();
+  const sf = (document.getElementById('filterTrialsStatus')?.value || '');
+  let list = _allCustomers.filter(c =>
+    ['trial_active','trial_expired'].includes(c.status)
+    && (!q || (c.name||'').toLowerCase().includes(q) || (c.slug||'').toLowerCase().includes(q) || (c.admin_name||'').toLowerCase().includes(q) || (c.admin_email||'').toLowerCase().includes(q))
+    && (!sf || c.status === sf)
+  );
+  list = applySort(list, _trialsSort.col, _trialsSort.dir);
+  document.getElementById('trialsTotal').textContent = `${list.length} trials`;
+  if (!list.length) { document.getElementById('trialsTable').innerHTML = '<div class="empty">No trials match.</div>'; return; }
+  const s = _trialsSort;
   document.getElementById('trialsTable').innerHTML = `
     <table class="tbl">
-      <thead><tr><th>Academy</th><th>Ends</th><th>Days</th><th>Last login</th><th>Engagement</th></tr></thead>
-      <tbody>${trials.map(c => `
+      <thead><tr>
+        <th onclick="toggleSort('name',_trialsSort,renderTrials)" style="cursor:pointer;">Academy${sortIcon('name',s)}</th>
+        <th onclick="toggleSort('admin_name',_trialsSort,renderTrials)" style="cursor:pointer;">Admin${sortIcon('admin_name',s)}</th>
+        <th onclick="toggleSort('trial_ends_at',_trialsSort,renderTrials)" style="cursor:pointer;">Ends${sortIcon('trial_ends_at',s)}</th>
+        <th onclick="toggleSort('days_left',_trialsSort,renderTrials)" style="cursor:pointer;">Days${sortIcon('days_left',s)}</th>
+        <th onclick="toggleSort('last_login_at',_trialsSort,renderTrials)" style="cursor:pointer;">Last login${sortIcon('last_login_at',s)}</th>
+        <th onclick="toggleSort('student_count',_trialsSort,renderTrials)" style="cursor:pointer;">Engagement${sortIcon('student_count',s)}</th>
+      </tr></thead>
+      <tbody>${list.map(c => `
         <tr onclick="openDetail('${c.id}')">
-          <td><b>${escapeHTML(c.name)}</b><br><span style="font-size:10px;color:var(--text-3);font-family:monospace;">${c.slug}${c.is_ghost ? '<span class="ghost-flag">GHOST</span>' : ''}</span></td>
+          <td><b>${escapeHTML(c.name)}</b><br><span style="font-size:10px;color:var(--text-3);font-family:monospace;">${c.slug}</span></td>
+          <td style="font-size:11px;color:var(--text-2);">${escapeHTML(c.admin_name||'—')}<br><span style="font-size:10px;color:var(--text-3);">${escapeHTML(c.admin_email||'')}</span></td>
           <td style="font-size:11px;">${formatDateTime(c.trial_ends_at)}</td>
           <td>${daysPill(c.days_left, c.status)}</td>
           <td style="font-size:11px;">${formatLastLogin(c.last_login_at)}</td>
-          <td><span class="engagement"><b>${c.student_count || 0}</b> stu · <b>${c.attendance_count || 0}</b> att</span></td>
+          <td><span class="engagement"><b>${c.student_count||0}</b> stu · <b>${c.attendance_count||0}</b> att</span></td>
         </tr>`).join('')}</tbody></table>`;
 }
 
@@ -656,22 +844,35 @@ function renderTrials() {
 // PAYING
 // =============================================================
 function renderPaying() {
-  const q = (document.getElementById('searchPaying').value || '').toLowerCase().trim();
-  const paying = _allCustomers.filter(c => ['active','plan_expired'].includes(c.status))
-    .filter(c => !q || (c.name||'').toLowerCase().includes(q) || (c.slug||'').toLowerCase().includes(q));
-  document.getElementById('payingTotal').textContent = `${paying.length} customers`;
-  if (paying.length === 0) { document.getElementById('payingTable').innerHTML = '<div class="empty">No paying customers yet.</div>'; return; }
-  paying.sort((a,b)=>(a.days_left || 9999)-(b.days_left || 9999));
+  const q  = (document.getElementById('searchPaying')?.value || '').toLowerCase().trim();
+  const pf = (document.getElementById('filterPayingPlan')?.value || '');
+  let list = _allCustomers.filter(c =>
+    ['active','plan_expired'].includes(c.status)
+    && (!q || (c.name||'').toLowerCase().includes(q) || (c.slug||'').toLowerCase().includes(q) || (c.admin_name||'').toLowerCase().includes(q) || (c.admin_email||'').toLowerCase().includes(q))
+    && (!pf || c.plan === pf)
+  );
+  list = applySort(list, _payingSort.col, _payingSort.dir);
+  document.getElementById('payingTotal').textContent = `${list.length} customers`;
+  if (!list.length) { document.getElementById('payingTable').innerHTML = '<div class="empty">No paying customers match.</div>'; return; }
+  const s = _payingSort;
   document.getElementById('payingTable').innerHTML = `
     <table class="tbl">
-      <thead><tr><th>Academy</th><th>Plan</th><th>Renews</th><th>Last login</th><th>Engagement</th></tr></thead>
-      <tbody>${paying.map(c => `
+      <thead><tr>
+        <th onclick="toggleSort('name',_payingSort,renderPaying)" style="cursor:pointer;">Academy${sortIcon('name',s)}</th>
+        <th onclick="toggleSort('admin_name',_payingSort,renderPaying)" style="cursor:pointer;">Admin${sortIcon('admin_name',s)}</th>
+        <th onclick="toggleSort('plan',_payingSort,renderPaying)" style="cursor:pointer;">Plan${sortIcon('plan',s)}</th>
+        <th onclick="toggleSort('plan_ends_at',_payingSort,renderPaying)" style="cursor:pointer;">Renews${sortIcon('plan_ends_at',s)}</th>
+        <th onclick="toggleSort('last_login_at',_payingSort,renderPaying)" style="cursor:pointer;">Last login${sortIcon('last_login_at',s)}</th>
+        <th onclick="toggleSort('student_count',_payingSort,renderPaying)" style="cursor:pointer;">Engagement${sortIcon('student_count',s)}</th>
+      </tr></thead>
+      <tbody>${list.map(c => `
         <tr onclick="openDetail('${c.id}')">
           <td><b>${escapeHTML(c.name)}</b><br><span style="font-size:10px;color:var(--text-3);font-family:monospace;">${c.slug}</span></td>
+          <td style="font-size:11px;color:var(--text-2);">${escapeHTML(c.admin_name||'—')}<br><span style="font-size:10px;color:var(--text-3);">${escapeHTML(c.admin_email||'')}</span></td>
           <td><span class="pill pill-blue">${escapeHTML(c.plan)}</span></td>
           <td style="font-size:11px;">${formatDateTime(c.plan_ends_at)} ${c.days_left !== null && c.days_left <= 7 ? '⚠️' : ''}</td>
           <td style="font-size:11px;">${formatLastLogin(c.last_login_at)}</td>
-          <td><span class="engagement"><b>${c.student_count || 0}</b> stu · <b>${c.attendance_count || 0}</b> att</span></td>
+          <td><span class="engagement"><b>${c.student_count||0}</b> stu · <b>${c.attendance_count||0}</b> att</span></td>
         </tr>`).join('')}</tbody></table>`;
 }
 
@@ -679,27 +880,39 @@ function renderPaying() {
 // ALL CUSTOMERS
 // =============================================================
 function renderCustomers() {
-  const q = (document.getElementById('searchCustomers').value || '').toLowerCase().trim();
+  const q  = (document.getElementById('searchCustomers')?.value || '').toLowerCase().trim();
+  const pf = (document.getElementById('filterCustomersPlan')?.value || '');
   let list = _allCustomers.slice();
-  if (_customerFilter === 'trial') list = list.filter(c => c.status === 'trial_active');
+  if (_customerFilter === 'trial')   list = list.filter(c => c.status === 'trial_active');
   else if (_customerFilter === 'paying') list = list.filter(c => c.status === 'active');
   else if (_customerFilter === 'frozen') list = list.filter(c => ['frozen','trial_expired','plan_expired'].includes(c.status));
-  else if (_customerFilter === 'ghost') list = list.filter(c => c.is_ghost);
+  else if (_customerFilter === 'ghost')  list = list.filter(c => c.is_ghost);
 
-  list = list.filter(c => !q || (c.name||'').toLowerCase().includes(q) || (c.slug||'').toLowerCase().includes(q) || (c.admin_email||'').toLowerCase().includes(q));
-
-  if (list.length === 0) { document.getElementById('customersTable').innerHTML = '<div class="empty">No customers match.</div>'; return; }
-
+  list = list.filter(c =>
+    (!q || (c.name||'').toLowerCase().includes(q) || (c.slug||'').toLowerCase().includes(q) || (c.admin_email||'').toLowerCase().includes(q) || (c.admin_name||'').toLowerCase().includes(q))
+    && (!pf || c.plan === pf)
+  );
+  list = applySort(list, _customerSort.col, _customerSort.dir);
+  if (!list.length) { document.getElementById('customersTable').innerHTML = '<div class="empty">No customers match.</div>'; return; }
+  const s = _customerSort;
   document.getElementById('customersTable').innerHTML = `
     <table class="tbl">
-      <thead><tr><th>Academy</th><th>Status</th><th>Joined</th><th>Last login</th><th>Engagement</th></tr></thead>
+      <thead><tr>
+        <th onclick="toggleSort('name',_customerSort,renderCustomers)" style="cursor:pointer;">Academy${sortIcon('name',s)}</th>
+        <th onclick="toggleSort('admin_name',_customerSort,renderCustomers)" style="cursor:pointer;">Admin${sortIcon('admin_name',s)}</th>
+        <th onclick="toggleSort('status',_customerSort,renderCustomers)" style="cursor:pointer;">Status${sortIcon('status',s)}</th>
+        <th onclick="toggleSort('signup_at',_customerSort,renderCustomers)" style="cursor:pointer;">Joined${sortIcon('signup_at',s)}</th>
+        <th onclick="toggleSort('last_login_at',_customerSort,renderCustomers)" style="cursor:pointer;">Last login${sortIcon('last_login_at',s)}</th>
+        <th onclick="toggleSort('student_count',_customerSort,renderCustomers)" style="cursor:pointer;">Students${sortIcon('student_count',s)}</th>
+      </tr></thead>
       <tbody>${list.map(c => `
         <tr onclick="openDetail('${c.id}')">
           <td><b>${escapeHTML(c.name)}</b><br><span style="font-size:10px;color:var(--text-3);font-family:monospace;">${c.slug}${c.is_ghost ? '<span class="ghost-flag">GHOST</span>' : ''}</span></td>
+          <td style="font-size:11px;color:var(--text-2);">${escapeHTML(c.admin_name||'—')}<br><span style="font-size:10px;color:var(--text-3);">${escapeHTML(c.admin_email||'')}</span></td>
           <td>${statusPill(c)}</td>
           <td style="font-size:11px;">${formatDate(c.signup_at)}</td>
           <td style="font-size:11px;">${formatLastLogin(c.last_login_at)}</td>
-          <td><span class="engagement"><b>${c.student_count || 0}</b> stu</span></td>
+          <td><span class="engagement"><b>${c.student_count||0}</b> stu</span></td>
         </tr>`).join('')}</tbody></table>`;
 }
 
@@ -885,20 +1098,7 @@ function renderDetail(c) {
   const isPaying = c.status === 'active';
   const elevActiveOnThis = _activeElevation && _activeElevation.academy_id === c.id;
 
-  let elevBox = '';
-  if (elevActiveOnThis) {
-    elevBox = `
-      <div class="elev-status-box">
-        <b>🔓 You have active elevation on this academy</b>
-        Access level: ${_activeElevation.access_level}<br>
-        Reason: ${escapeHTML(_activeElevation.reason)}<br>
-        <button class="action-btn" style="margin-top:6px;width:auto;padding:5px 10px;font-size:11px;" onclick="releaseActiveElevation()">Release now</button>
-      </div>`;
-  }
-
   document.getElementById('dpBody').innerHTML = `
-    ${elevBox}
-
     <div class="detail-section">
       <h4>STATUS</h4>
       <dl class="detail-row">
@@ -932,17 +1132,15 @@ function renderDetail(c) {
         <button class="action-btn" onclick="actionEmail()">✉️ Open email with pre-filled message</button>
         ${(isTrial || isFrozen) ? `<button class="action-btn" onclick="openExtendModal()">⏱️ Extend trial</button>` : ''}
         <button class="action-btn" onclick="openChangePlanModal()">💎 Change subscription plan</button>
+        <button class="action-btn" style="background:#16a34a;color:#fff;border-color:#16a34a;" onclick="openLogPaymentModal()">💰 Log payment received</button>
         ${isFrozen ? `<button class="action-btn primary" onclick="openChangePlanModal()">🚀 Unfreeze + activate</button>` : ''}
         ${(isTrial || isPaying) ? `<button class="action-btn danger" onclick="confirmFreeze()">🔒 Freeze account</button>` : ''}
       </div>
     </div>
 
     <div class="detail-section">
-      <h4>🔓 SUPPORT ELEVATION (access customer's PII)</h4>
-      ${elevActiveOnThis
-        ? `<div style="font-size:12px;color:var(--text-2);">You currently have access. Use it via SQL or the customer login.</div>`
-        : `<div style="font-size:11px;color:var(--text-3);margin-bottom:8px;line-height:1.5;">By default you can only see metadata. To view/edit student data, fees, or attendance, request elevation with a reason. The customer will be notified.</div>
-           <button class="action-btn purple" onclick="openElevationModal()">🔓 Request elevation access</button>`}
+      <h4>PAYMENT HISTORY</h4>
+      <div id="dpPaymentHistory"><div class="loading" style="font-size:12px;">Loading...</div></div>
     </div>
 
     <div class="detail-section">
@@ -951,6 +1149,8 @@ function renderDetail(c) {
         <button class="action-btn" onclick="window.open('index.html?a=${encodeURIComponent(c.slug)}','_blank')">🌐 Open their login page</button>
       </div>
     </div>`;
+  // Load payment history async
+  loadPaymentHistory(c.id);
 }
 
 // =============================================================
@@ -1133,6 +1333,263 @@ function showModal(opts) {
   });
   document.getElementById('modalOverlay').classList.add('show');
 }
+
+// =============================================================
+// CREATE ACADEMY
+// =============================================================
+function openCreateAcademyModal() {
+  document.getElementById('ca_name').value = '';
+  document.getElementById('ca_slug').value = '';
+  document.getElementById('ca_email').value = '';
+  document.getElementById('ca_admin_name').value = '';
+  document.getElementById('ca_password').value = '';
+  document.getElementById('ca_plan').value = 'trial';
+  document.getElementById('createAcademyError').style.display = 'none';
+  document.getElementById('createAcademyOverlay').style.display = 'flex';
+}
+function closeCreateAcademyModal() {
+  document.getElementById('createAcademyOverlay').style.display = 'none';
+}
+
+async function submitCreateAcademy() {
+  const errEl  = document.getElementById('createAcademyError');
+  const btn    = document.getElementById('ca_submit_btn');
+  const name   = document.getElementById('ca_name').value.trim();
+  const slug   = document.getElementById('ca_slug').value.trim().toLowerCase();
+  const email  = document.getElementById('ca_email').value.trim().toLowerCase();
+  const aname  = document.getElementById('ca_admin_name').value.trim();
+  const pass   = document.getElementById('ca_password').value;
+  const plan   = document.getElementById('ca_plan').value;
+
+  errEl.style.display = 'none';
+
+  if (!name || !slug || !email || !pass) {
+    errEl.textContent = 'Academy name, ID, email and password are required.';
+    errEl.style.display = 'block'; return;
+  }
+  if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(slug)) {
+    errEl.textContent = 'Academy ID must be 3-32 lowercase letters, numbers or hyphens.';
+    errEl.style.display = 'block'; return;
+  }
+  if (pass.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters.';
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.textContent = 'Creating...'; btn.disabled = true;
+
+  try {
+    // Call the signup Edge Function (it handles academy + admin user creation)
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify({ email, password: pass, slug, academy_name: name, admin_name: aname || email })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || data.message || 'Signup failed');
+    }
+
+    // If plan is not trial, upgrade it immediately
+    if (plan !== 'trial') {
+      const planEnds = new Date(Date.now() + 30*24*60*60*1000).toISOString();
+      await window._sb.from('academies').update({
+        plan, plan_ends_at: planEnds, trial_ends_at: null
+      }).eq('slug', slug);
+    }
+
+    closeCreateAcademyModal();
+    showToast('✅ Academy "' + name + '" created successfully!');
+    loadDashboard();
+  } catch(e) {
+    errEl.textContent = e.message || 'Failed to create academy. Try again.';
+    errEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Create Academy'; btn.disabled = false;
+  }
+}
+
+// =============================================================
+// LOG PAYMENT
+// =============================================================
+const PLAN_PRICES = { basic:{monthly:499,annual:4999}, pro:{monthly:1499,annual:14999}, premium:{monthly:2999,annual:29999} };
+
+function openLogPaymentModal() {
+  const c = _currentDetail;
+  if (!c) return;
+  document.getElementById('lpAcademyName').textContent = 'Academy: ' + (c.name || c.slug);
+  document.getElementById('logPaymentError').style.display = 'none';
+  // Pre-fill plan from current plan
+  const curPlan = c.plan && ['basic','pro','premium'].includes(c.plan) ? c.plan : 'basic';
+  document.getElementById('lp_plan').value    = curPlan;
+  document.getElementById('lp_billing').value = 'monthly';
+  document.getElementById('lp_ref').value     = '';
+  document.getElementById('lp_notes').value   = '';
+  document.getElementById('lp_activate').checked = true;
+  // Set default dates
+  const today = new Date();
+  const end   = new Date(today); end.setMonth(end.getMonth() + 1);
+  document.getElementById('lp_start').value = today.toISOString().slice(0,10);
+  document.getElementById('lp_end').value   = end.toISOString().slice(0,10);
+  updateLPAmount();
+  document.getElementById('logPaymentOverlay').style.display = 'flex';
+}
+
+function updateLPAmount() {
+  const plan    = document.getElementById('lp_plan').value;
+  const billing = document.getElementById('lp_billing').value;
+  const prices  = PLAN_PRICES[plan];
+  if (prices) document.getElementById('lp_amount').value = prices[billing];
+  // Auto-adjust end date
+  const startEl = document.getElementById('lp_start');
+  const endEl   = document.getElementById('lp_end');
+  if (startEl.value) {
+    const s = new Date(startEl.value);
+    if (billing === 'annual') s.setFullYear(s.getFullYear() + 1);
+    else s.setMonth(s.getMonth() + 1);
+    endEl.value = s.toISOString().slice(0,10);
+  }
+}
+
+function closeLogPaymentModal() {
+  document.getElementById('logPaymentOverlay').style.display = 'none';
+}
+
+async function submitLogPayment() {
+  const c      = _currentDetail;
+  const errEl  = document.getElementById('logPaymentError');
+  const btn    = document.getElementById('lp_submit_btn');
+  const plan   = document.getElementById('lp_plan').value;
+  const billing = document.getElementById('lp_billing').value;
+  const amount = parseInt(document.getElementById('lp_amount').value);
+  const start  = document.getElementById('lp_start').value;
+  const end    = document.getElementById('lp_end').value;
+  const ref    = document.getElementById('lp_ref').value.trim();
+  const notes  = document.getElementById('lp_notes').value.trim();
+  const activate = document.getElementById('lp_activate').checked;
+
+  errEl.style.display = 'none';
+
+  if (!plan || !amount || !start || !end) {
+    errEl.textContent = 'Plan, amount, start and end dates are required.';
+    errEl.style.display = 'block'; return;
+  }
+  if (isNaN(amount) || amount <= 0) {
+    errEl.textContent = 'Amount must be a positive number.';
+    errEl.style.display = 'block'; return;
+  }
+  if (new Date(end) <= new Date(start)) {
+    errEl.textContent = 'End date must be after start date.';
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.textContent = 'Saving...'; btn.disabled = true;
+
+  try {
+    const jwt = (await window._sb.auth.getSession()).data.session?.access_token;
+
+    // 1. Log payment via admin RPC (service role via Edge Function)
+    const logRes = await fetch(`${SUPABASE_URL}/functions/v1/admin-action`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+jwt, 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify({
+        action: 'log_payment',
+        academy_id: c.id, plan, billing, amount,
+        period_start: new Date(start).toISOString(),
+        period_end:   new Date(end).toISOString(),
+        payment_ref: ref, notes
+      })
+    });
+
+    if (!logRes.ok) {
+      // Fallback: insert directly (works if elevation is active)
+      const { error: insErr } = await window._sb.from('subscription_log').insert({
+        academy_id: c.id, plan, billing, amount,
+        period_start: new Date(start).toISOString(),
+        period_end:   new Date(end).toISOString(),
+        payment_ref: ref, notes, created_by: 'superadmin'
+      });
+      if (insErr) throw new Error('Could not log payment: ' + insErr.message);
+    }
+
+    // 2. Activate the plan if checkbox is checked
+    if (activate) {
+      await window._sb.rpc('admin_change_plan', {
+        p_academy_id: c.id,
+        p_plan: plan,
+        p_months: 0,  // we set exact end date
+        p_custom_end: new Date(end).toISOString()
+      }).catch(async () => {
+        // Fallback direct update
+        await window._sb.from('academies').update({
+          plan, plan_ends_at: new Date(end).toISOString(), frozen_at: null, trial_ends_at: null
+        }).eq('id', c.id);
+      });
+    }
+
+    closeLogPaymentModal();
+    showToast('✅ Payment logged' + (activate ? ' + plan activated' : ''));
+    openDetail(c.id); // refresh detail panel
+    loadDashboard();  // refresh revenue stats
+  } catch(e) {
+    errEl.textContent = e.message || 'Failed to log payment.';
+    errEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Log Payment'; btn.disabled = false;
+  }
+}
+
+// =============================================================
+// PAYMENT HISTORY
+// =============================================================
+async function loadPaymentHistory(academyId) {
+  const el = document.getElementById('dpPaymentHistory');
+  if (!el) return;
+  try {
+    const { data, error } = await window._sb
+      .from('subscription_log')
+      .select('*')
+      .eq('academy_id', academyId)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+    if (!data || !data.length) {
+      el.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:6px 0;">No payments logged yet.</div>';
+      return;
+    }
+    const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+    el.innerHTML = data.map(p => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);gap:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);">${fmt(p.amount)} · ${p.plan} · ${p.billing}</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">
+            ${p.period_start ? p.period_start.slice(0,10) : '—'} → ${p.period_end ? p.period_end.slice(0,10) : '—'}
+            ${p.payment_ref ? ' · ' + escapeHTML(p.payment_ref) : ''}
+          </div>
+          ${p.notes ? `<div style="font-size:11px;color:var(--text-3);">${escapeHTML(p.notes)}</div>` : ''}
+        </div>
+        <div style="font-size:11px;color:var(--text-3);flex-shrink:0;">${p.created_at ? p.created_at.slice(0,10) : ''}</div>
+      </div>`).join('');
+  } catch(e) {
+    if (el) el.innerHTML = '<div style="font-size:12px;color:var(--text-3);">Payment history unavailable (run SQL migration first)</div>';
+  }
+}
+
+function showToast(msg) {
+  let t = document.getElementById('adminToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'adminToast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#10131a;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:opacity .3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+}
+
 function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
 
 // =============================================================
